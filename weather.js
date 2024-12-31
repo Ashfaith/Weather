@@ -55,9 +55,10 @@ async function convertPosition(lat, long) {
     try {
         latLongCall = await fetch(`https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${long}&apiKey=0034a37ec8f44864a9c4da218f500454`, {mode: 'cors'});
         latLongJson = await latLongCall.json()
-        const state = latLongJson.features[0].properties.state;
+        const suburb = latLongJson.features[0].properties.suburb;
         const country = latLongJson.features[0].properties.country;
-        const convertedPosition = `${state} ${country}`;
+        const convertedPosition = `${suburb} ${country}`;
+        console.log(latLongJson.features[0].properties);
         positionName = convertedPosition;
         getWeather(positionName);
     }
