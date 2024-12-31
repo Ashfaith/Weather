@@ -1,4 +1,5 @@
 let weatherObj;
+let positionName;
 const main = document.querySelector('.main');
 const weatherDisplay = document.querySelector('.weather-display');
 const locationContainer = document.querySelector(".location-container");
@@ -19,6 +20,7 @@ const description = document.querySelector(".description");
 const locationSearch = document.querySelector(".location-search");
 const searchInput = document.querySelector('.search-text-input');
 const searchSubmit = document.querySelector('.search-submit');
+const searchButton = document.querySelector('.search-button');
 const date = new Date()
 const day = date.getDate().toString();
 const month = date.toLocaleString('default', { month: 'long'});
@@ -41,7 +43,30 @@ const weatherIcons = {
     "wind": "WeatherIcons/SVG/3rd Set - Color/wind.svg"
 };
 
-window.addEventListener('load', () => {
+document.addEventListener("DOMContentLoaded", (event) => {
+    navigator.geolocation.getCurrentPosition((position => {
+        const lat = position.coords.latitude;
+        const long = position.coords.longitude;
+        convertPosition(lat, long)
+    }))
+  });
+
+async function convertPosition(lat, long) {
+    try {
+        latLongCall = await fetch(`https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${long}&apiKey=0034a37ec8f44864a9c4da218f500454`, {mode: 'cors'});
+        latLongJson = await latLongCall.json()
+        const state = latLongJson.features[0].properties.state;
+        const country = latLongJson.features[0].properties.country;
+        const convertedPosition = `${state} ${country}`;
+        positionName = convertedPosition;
+        getWeather(positionName);
+    }
+    catch {
+        console.log('...')
+    }
+}
+
+window.addEventListener("load", () => {
     sliderInput.checked = true; 
     tempUnit = true; 
     updateDisplay();
@@ -116,9 +141,9 @@ const nextFewDays = (upcomingDays) => {
 
 
 
-async function getWeather(html) {
+async function getWeather(position) {
     try {
-        const weatherCall = await fetch(html, {mode: 'cors'});
+        const weatherCall = await fetch(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${position}?unitGroup=us&key=33KQCSB2EU8HM268EPTNJNT9L&contentType=json`, {mode: 'cors'});
         weatherObj = await weatherCall.json();
         console.log(weatherObj);
         setDisplayData(weatherObj);
@@ -129,11 +154,10 @@ async function getWeather(html) {
     }
 }
 
-searchSubmit.addEventListener("submit", (e) => {
+searchButton.addEventListener("click", (e) => {
     e.preventDefault()
-    const location = searchInput.value; 
-    console.log("test")
-    getWeather(`https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${location}?unitGroup=us&key=33KQCSB2EU8HM268EPTNJNT9L&contentType=json`);
+    positionName = searchInput.value;
+    getWeather(positionName);
     todayDate.innerText = `${day} ${month}`;
 });
 
