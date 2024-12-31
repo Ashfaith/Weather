@@ -51,6 +51,27 @@ document.addEventListener("DOMContentLoaded", (event) => {
     }))
   });
 
+  navigator.permissions.query({name: 'geolocation'}).then(permissionStatus => {
+    if (permissionStatus.state === 'granted') {
+        permissionStatus.onchange = () => {
+            if (permissionStatus.state !== 'granted') {
+                navigator.geolocation.getCurrentPosition((position => {
+                    const lat = position.coords.latitude;
+                    const long = position.coords.longitude;
+                    convertPosition(lat, long)
+                }))
+            }
+        }
+    } else {
+        navigator.geolocation.getCurrentPosition((position => {
+            const lat = position.coords.latitude;
+            const long = position.coords.longitude;
+            convertPosition(lat, long)
+        }))
+    }
+});
+
+
 async function convertPosition(lat, long) {
     try {
         latLongCall = await fetch(`https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${long}&apiKey=0034a37ec8f44864a9c4da218f500454`, {mode: 'cors'});
