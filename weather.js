@@ -51,26 +51,6 @@ document.addEventListener("DOMContentLoaded", (event) => {
     }))
   });
 
-  navigator.permissions.query({name: 'geolocation'}).then(permissionStatus => {
-    if (permissionStatus.state === 'granted') {
-        permissionStatus.onchange = () => {
-            if (permissionStatus.state !== 'granted') {
-                navigator.geolocation.getCurrentPosition((position => {
-                    const lat = position.coords.latitude;
-                    const long = position.coords.longitude;
-                    convertPosition(lat, long)
-                }))
-            }
-        }
-    } else {
-        navigator.geolocation.getCurrentPosition((position => {
-            const lat = position.coords.latitude;
-            const long = position.coords.longitude;
-            convertPosition(lat, long)
-        }))
-    }
-});
-
 
 async function convertPosition(lat, long) {
     try {
