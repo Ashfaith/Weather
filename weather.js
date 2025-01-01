@@ -42,13 +42,27 @@ const weatherIcons = {
     "thunderstorm": "WeatherIcons/SVG/3rd Set - Color/thunderstorm.svg",
     "wind": "WeatherIcons/SVG/3rd Set - Color/wind.svg"
 };
+const positionOptions = {
+    enableHighAccuracy: false,
+    timeout: 10000,
+    maximumAge: 0,
+}
+
+function posFound(pos) {
+    console.log(pos);
+    const lat = pos.coords.latitude;
+    const long = pos.coords.longitude;
+    convertPosition(lat, long)
+}
+
+function posNotFound(err) {
+    console.warn(`ERROR(${err.code}): ${err.message}`);
+    alert('work ffs');
+    navigator.geolocation.getCurrentPosition(posFound, posNotFound, positionOptions);
+}
 
 document.addEventListener("DOMContentLoaded", (event) => {
-    navigator.geolocation.getCurrentPosition((position => {
-        const lat = position.coords.latitude;
-        const long = position.coords.longitude;
-        convertPosition(lat, long)
-    }))
+    navigator.geolocation.getCurrentPosition(posFound, posNotFound, positionOptions); 
   });
 
 
